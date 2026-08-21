@@ -1,0 +1,6 @@
+{
+  "name": "AIR QUALITY LEVEL PREDICTOR",
+  "description": "AIR QUALITY LEVEL PREDICTOR: Real-Time Air Quality Monitoring, Future Predictions, High-Risk Zone Analysis, Pollution Causes, and Health Protection by Team Synapse",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
