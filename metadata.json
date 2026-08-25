@@ -1,6 +1,0 @@
-{
-  "name": "Air Quality Level Predictor",
-  "description": "AI-Powered Real-Time Air Intelligence for India by TEAM SYNAPSE. Monitor, Understand, Predict, Warn.",
-  "requestFramePermissions": ["geolocation"],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}
