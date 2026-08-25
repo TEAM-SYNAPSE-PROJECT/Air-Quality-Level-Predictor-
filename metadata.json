@@ -1,6 +1,0 @@
-{
-  "name": "Air Quality Level Predictor",
-  "description": "Live India-wide Air Quality & Environmental Intelligence Platform with dynamic real-time AQI, ML forecasting, CPCB calculator, risk alerts, and interactive spatial maps.",
-  "requestFramePermissions": ["geolocation"],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}
