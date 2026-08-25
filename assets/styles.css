@@ -1,0 +1,275 @@
+/* Sophisticated Dark Theme - Air Quality Level Predictor */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg-primary: #0A0A0A;
+  --bg-secondary: #111111;
+  --bg-surface: #151515;
+  --bg-card: #111111;
+  --border-primary: #2A2A2A;
+  --border-secondary: #222222;
+  --border-subtle: #1A1A1A;
+  
+  --accent-gold: #C5A368;
+  --accent-gold-light: #D4B87C;
+  --accent-gold-dark: #8F7649;
+  --accent-emerald: #10B981;
+  --accent-crimson: #EF4444;
+  --accent-amber: #F59E0B;
+  
+  --text-primary: #F5F5F5;
+  --text-secondary: #888888;
+  --text-muted: #555555;
+  --text-dim: #444444;
+}
+
+html, body, [class*="css"] {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
+}
+
+/* Headings with Sophisticated Serif Styling */
+h1, h2, h3, h4, .font-serif {
+  font-family: 'Playfair Display', Georgia, serif;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+h1 {
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+h2 {
+  font-weight: 600;
+  color: #F5F5F5;
+}
+
+h3 {
+  font-weight: 600;
+  color: #E5E5E5;
+}
+
+h4 {
+  font-weight: 500;
+  color: #D4D4D4;
+}
+
+/* Section Subtitles & Eyebrows */
+.eyebrow-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--text-muted);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+/* Command Center Header */
+.command-header {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  padding: 22px 26px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+}
+
+.command-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #FFFFFF;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.command-title .accent-gold {
+  color: var(--accent-gold);
+  font-style: italic;
+}
+
+.command-subtitle {
+  font-size: 10px;
+  color: var(--accent-gold);
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+/* Status Badges */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.status-live {
+  background: #151515;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #10B981;
+}
+
+.status-cached {
+  background: #151515;
+  border: 1px solid rgba(197, 163, 104, 0.4);
+  color: var(--accent-gold);
+}
+
+.status-local {
+  background: #151515;
+  border: 1px solid var(--border-primary);
+  color: #A3A3A3;
+}
+
+.status-demo {
+  background: #151515;
+  border: 1px solid rgba(197, 163, 104, 0.3);
+  color: var(--accent-gold-light);
+}
+
+/* Metric / Telemetry Cards */
+.telemetry-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-secondary);
+  border-radius: 8px;
+  padding: 18px 22px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.telemetry-card:hover {
+  border-color: var(--border-primary);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+.telemetry-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.telemetry-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-top: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: -0.02em;
+}
+
+.telemetry-sub {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+/* Luxury Gold Accent Elements */
+.gold-accent {
+  color: var(--accent-gold);
+}
+
+.gold-border {
+  border-color: var(--accent-gold);
+}
+
+/* AQI Categories styling in Sophisticated Palette */
+.aqi-good { color: #10B981; }
+.aqi-satisfactory { color: #34D399; }
+.aqi-moderate { color: #C5A368; }
+.aqi-poor { color: #EAB308; }
+.aqi-very-poor { color: #F97316; }
+.aqi-severe { color: #EF4444; }
+
+/* Custom Luxury Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0A0A0A;
+}
+::-webkit-scrollbar-thumb {
+  background: #222222;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #333333;
+}
+
+/* Streamlit Component Overrides */
+div[data-testid="stSidebar"] {
+  background-color: #0A0A0A;
+  border-right: 1px solid var(--border-primary);
+}
+
+div[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] h3 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 16px;
+  color: var(--accent-gold);
+  letter-spacing: 0.05em;
+}
+
+div[data-testid="stMetricValue"] {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+div[data-testid="stMetricLabel"] {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
+}
+
+/* Button & Selectbox Refinement */
+button[kind="primary"], .stButton > button {
+  background-color: #151515 !important;
+  color: #F5F5F5 !important;
+  border: 1px solid #2A2A2A !important;
+  border-radius: 6px !important;
+  font-size: 11px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.1em !important;
+  font-weight: 600 !important;
+  transition: all 0.2s ease !important;
+}
+
+button[kind="primary"]:hover, .stButton > button:hover {
+  border-color: var(--accent-gold) !important;
+  color: var(--accent-gold) !important;
+  background-color: #1A1A1A !important;
+}
+
+/* Input Fields & Text Areas */
+input, select, textarea, div[data-baseweb="select"] {
+  background-color: #111111 !important;
+  border-color: #222222 !important;
+  color: #F5F5F5 !important;
+  border-radius: 6px !important;
+}
+
+/* Tables & Dataframes */
+div[data-testid="stDataFrame"] {
+  border: 1px solid #222222;
+  border-radius: 6px;
+  background: #111111;
+}
+
+hr {
+  border-color: #1F1F1F !important;
+}
