@@ -2,6 +2,7 @@
 Page 5: Detailed 6-Pollutant Chemical & Environmental Breakdown.
 """
 import streamlit as st
+from components.page_theme import prepare_page
 import plotly.express as px
 from chatbot.knowledge_base import POLLUTANT_KNOWLEDGE
 from services.air_quality_service import fetch_live_city_air_quality
@@ -11,8 +12,8 @@ from components.cards import render_metric_card
 
 st.set_page_config(page_title="Pollutant Analysis | Air Quality Predictor", page_icon="🌫️", layout="wide")
 
-with open("assets/styles.css") as f:
-    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+prepare_page()
+
 
 cities = load_indian_cities()
 city_names = [c["city"] for c in cities]

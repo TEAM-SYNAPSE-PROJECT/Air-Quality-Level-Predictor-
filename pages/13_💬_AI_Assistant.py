@@ -2,6 +2,7 @@
 Page 13: Fullscreen Conversational Environmental AI Assistant.
 """
 import streamlit as st
+from components.page_theme import prepare_page
 from utils.time_utils import get_live_time_metrics
 from utils.season_utils import get_current_season
 from services.air_quality_service import fetch_live_city_air_quality
@@ -13,8 +14,8 @@ from components.chatbot_ui import render_embedded_chatbot
 
 st.set_page_config(page_title="AI Assistant | Air Quality Predictor", page_icon="💬", layout="wide")
 
-with open("assets/styles.css") as f:
-    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+prepare_page()
+
 
 cities = load_indian_cities()
 city_names = [c["city"] for c in cities]

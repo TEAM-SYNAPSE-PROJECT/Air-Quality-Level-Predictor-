@@ -1,73 +1,35 @@
-"""
-Page 15: User Feedback & Continuous Quality Auditing.
-"""
 import streamlit as st
-import json
-import os
-from datetime import datetime
 import pandas as pd
 from components.navbar import render_command_header
+from services.auth_service import is_logged_in, sync_current_user, save_feedback, load_feedback
+from components.page_theme import prepare_page
 
 st.set_page_config(page_title="Feedback | Air Quality Predictor", page_icon="⭐", layout="wide")
+prepare_page()
+render_command_header(city="Feedback Center",state="User Feedback & Quality",status="OPERATIONAL")
+st.markdown('<div class="page-chip">COMMUNITY QUALITY LOOP</div>',unsafe_allow_html=True)
+st.title("⭐ Feedback Center")
+st.caption("Feedback is stored in the persistent SQLite database and associated with the signed-in Google account.")
 
-with open("assets/styles.css") as f:
-    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+user=sync_current_user()
+if not user:
+    st.info("Please sign in with Google before submitting feedback so your feedback is tied to a real account.")
+    st.stop()
 
-render_command_header(city="Feedback Center", state="User Feedback & Quality", status="OPERATIONAL")
-
-st.markdown("### ⭐ USER FEEDBACK & EXPERIENCE AUDITING")
-st.caption("Help us enhance environmental sensor calibration, model accuracy, and platform capabilities.")
-
-FEEDBACK_FILE = "data/feedback.json"
-
-def load_feedbacks():
-    if os.path.exists(FEEDBACK_FILE):
-        try:
-            with open(FEEDBACK_FILE, "r") as f:
-                return json.load(f)
-        except Exception:
-            return []
-    return []
-
-def save_feedback(entry):
-    entries = load_feedbacks()
-    entries.insert(0, entry)
-    os.makedirs("data", exist_ok=True)
-    with open(FEEDBACK_FILE, "w") as f:
-        json.dump(entries, f, indent=2)
-
-col_f1, col_f2 = st.columns([1.2, 1])
-
-with col_f1:
-    st.markdown("#### Submit Your Assessment")
-    with st.form("feedback_form", clear_on_submit=True):
-        name = st.text_input("Your Name / Organization", placeholder="e.g. Environmental Researcher / Citizen")
-        email = st.text_input("Contact Email (Optional)", placeholder="name@domain.com")
-        rating = st.select_slider("Overall Platform Rating", options=[1, 2, 3, 4, 5], value=5, format_func=lambda x: "⭐" * x)
-        category = st.selectbox("Feedback Category", ["Sensor / Data Accuracy", "ML Forecast Evaluation", "Feature Request", "UI / Usability", "General Experience"])
-        comments = st.text_area("Detailed Comments / Suggestions", placeholder="Provide specific feedback on sensor data, predictions, or improvements...")
-        
-        submitted = st.form_submit_button("🚀 Submit Feedback", use_container_width=True)
-        if submitted:
+left,right=st.columns([1.05,1.25])
+with left:
+    st.markdown(f"**Signed in:** {user['name']}  ")
+    st.caption(user['email'])
+    with st.form("feedback_form",clear_on_submit=True):
+        rating=st.select_slider("Overall Platform Rating",options=[1,2,3,4,5],value=5,format_func=lambda x:"⭐"*x)
+        category=st.selectbox("Feedback Category",["Sensor / Data Accuracy","ML Forecast Evaluation","Feature Request","UI / Usability","General Experience"])
+        comments=st.text_area("Detailed Comments / Suggestions",placeholder="Tell us what worked, what felt dull, or what should improve.")
+        if st.form_submit_button("🚀 Submit Feedback",use_container_width=True):
             if comments.strip():
-                entry = {
-                    "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S IST"),
-                    "name": name.strip() or "Anonymous Citizen",
-                    "email": email.strip() or "N/A",
-                    "rating": rating,
-                    "category": category,
-                    "comments": comments.strip()
-                }
-                save_feedback(entry)
-                st.success("✅ Thank you! Your feedback has been recorded successfully.")
-            else:
-                st.error("Please enter your comments before submitting.")
-
-with col_f2:
-    st.markdown("#### 📋 Community Assessments Log")
-    feedbacks = load_feedbacks()
-    if feedbacks:
-        df_feed = pd.DataFrame(feedbacks)
-        st.dataframe(df_feed[["timestamp", "name", "rating", "category", "comments"]], hide_index=True, use_container_width=True)
-    else:
-        st.info("No feedback entries recorded yet. Be the first to submit your review!")
+                save_feedback(user,rating,category,comments.strip()); st.success("Feedback saved to the database.")
+            else: st.error("Please enter your comments.")
+with right:
+    st.markdown("### 📋 Recent Community Feedback")
+    rows=load_feedback(100)
+    if rows: st.dataframe(pd.DataFrame(rows),hide_index=True,use_container_width=True)
+    else: st.info("No feedback has been submitted yet.")

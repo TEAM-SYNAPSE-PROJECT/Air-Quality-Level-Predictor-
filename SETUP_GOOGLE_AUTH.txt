@@ -1,0 +1,13 @@
+GOOGLE AUTH + REAL DATABASE SETUP
+
+1. Install dependencies from requirements.txt.
+2. Copy .streamlit/secrets.toml.example -> .streamlit/secrets.toml.
+3. Create a Google OAuth/OIDC web client. Authorized redirect URI for local testing:
+   http://localhost:8501/oauth2callback
+4. Put your real client_id, client_secret and a long random cookie_secret into secrets.toml.
+5. For deployment, change redirect_uri to https://YOUR-DOMAIN/oauth2callback and register that exact URI with Google.
+6. Run: streamlit run app.py
+7. data/users.db is a real SQLite database. It is created automatically on first authenticated sign-in.
+8. Feedback is stored in the same database.
+9. PDF/CSV report download controls are rendered only after a real authenticated Google session is detected.
+10. If you deploy to a host with an ephemeral filesystem, attach persistent storage or use a managed database for long-term user records.

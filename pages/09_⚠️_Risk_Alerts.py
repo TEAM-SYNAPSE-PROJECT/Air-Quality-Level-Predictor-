@@ -2,6 +2,7 @@
 Page 9: Early Warning Notification & Multi-Scenario Alert Dispatcher.
 """
 import streamlit as st
+from components.page_theme import prepare_page
 from ml.early_warning import evaluate_early_warnings
 from services.air_quality_service import fetch_live_city_air_quality
 from services.location_service import load_indian_cities
@@ -10,8 +11,8 @@ from components.alerts import render_alert_banners
 
 st.set_page_config(page_title="Risk Alerts | Air Quality Predictor", page_icon="⚠️", layout="wide")
 
-with open("assets/styles.css") as f:
-    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+prepare_page()
+
 
 cities = load_indian_cities()
 city_names = [c["city"] for c in cities]

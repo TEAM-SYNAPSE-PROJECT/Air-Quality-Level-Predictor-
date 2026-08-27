@@ -6,9 +6,6 @@ Dynamic CPCB AQI Calculation, Weather Integration, and Embedded AI Assistance.
 """
 import streamlit as st
 import pandas as pd
-import folium
-from streamlit_folium import st_folium
-
 from utils.time_utils import get_live_time_metrics
 from utils.season_utils import get_current_season
 from services.air_quality_service import (
@@ -28,9 +25,8 @@ from components.navbar import render_command_header
 from components.gauges import render_aqi_gauge
 from components.cards import render_metric_card, render_pollutant_breakdown_grid
 from components.charts import render_forecast_horizon_chart
-from components.maps import create_folium_air_quality_map
 from components.alerts import render_alert_banners
-from components.chatbot_ui import render_embedded_chatbot
+from components.page_theme import prepare_page
 from components.location_card import (
     render_location_action_bar,
     render_accuracy_warning_banner,
@@ -44,6 +40,8 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+prepare_page()
 
 # Load custom CSS
 try:
@@ -313,26 +311,6 @@ render_location_aqi_table(
     season_name=season["name"]
 )
 
-# 8. Interactive Live Location Map (Requirements 33 & 52)
-st.markdown("---")
-st.markdown("### 🗺️ Live Location Map & Surrounding CAAQMS Network")
-st.caption(f"Interactive geospatial view centering on your location (**{st.session_state.selected_city}**) and displaying nearest sensor proximity.")
-
-map_preview_df = df_all_india.copy()
-folium_map = create_folium_air_quality_map(
-    df_cities=map_preview_df,
-    user_lat=st.session_state.selected_lat,
-    user_lon=st.session_state.selected_lon,
-    user_city=st.session_state.selected_city,
-    user_state=st.session_state.selected_state,
-    is_live_gps=st.session_state.is_live_gps,
-    nearest_station=nearest_station,
-    station_aqi=aq_data["aqi"],
-    station_aqi_cat=aq_data["aqi_category"],
-    zoom_start=9 if st.session_state.is_live_gps else 7
-)
-st_folium(folium_map, width="100%", height=460)
-
 # 9. Top 10 At-Risk Cities & Machine Learning Forecast Horizon
 st.markdown("---")
 col_hotspots, col_forecast = st.columns([1.3, 1.1])
@@ -368,39 +346,3 @@ with i_col3:
     render_metric_card("Cities with Clean Air", f"{india_status['cities_good_satisfactory']}", "AQI <= 100 (Good & Satisfactory)", "Healthy", "#10b981")
 with i_col4:
     render_metric_card("Cities Requiring Attention", f"{india_status['cities_requiring_attention']}", "AQI 101 - 200 (Moderate)", "Watchlist", "#f59e0b")
-
-# 11. Embedded AI Assistant Widget (Location-Aware)
-st.markdown("---")
-live_chat_context = {
-    "city": st.session_state.selected_city,
-    "state": st.session_state.selected_state,
-    "district": st.session_state.detected_district,
-    "latitude": st.session_state.selected_lat,
-    "longitude": st.session_state.selected_lon,
-    "is_live_gps": st.session_state.is_live_gps,
-    "nearest_station": nearest_station,
-    "aqi": aq_data["aqi"],
-    "aqi_category": aq_data["aqi_category"],
-    "dominant_pollutant": aq_data["dominant_pollutant"],
-    "risk_level": aq_data["risk_level"],
-    "risk_details": aq_data.get("risk_details", {}),
-    "health_statement": aq_data.get("health_statement", ""),
-    "pollutants": aq_data["pollutants"],
-    "sub_indices": aq_data.get("sub_indices", {}),
-    "temperature": weather_data["temperature"],
-    "feels_like": weather_data["feels_like"],
-    "humidity": weather_data["humidity"],
-    "wind_speed": weather_data["wind_speed"],
-    "wind_direction": weather_data["wind_direction"],
-    "pressure": weather_data["pressure"],
-    "rainfall": weather_data["rainfall"],
-    "weather_condition": weather_data["weather_condition"],
-    "season": season["name"],
-    "time_str": t_metrics["time_str"],
-    "date_str": t_metrics["date_str"],
-    "hour": t_metrics["datetime"].hour,
-    "data_status": aq_data["status"],
-    "forecasts": forecast_data
-}
-
-render_embedded_chatbot(live_chat_context, key_suffix="home_page")

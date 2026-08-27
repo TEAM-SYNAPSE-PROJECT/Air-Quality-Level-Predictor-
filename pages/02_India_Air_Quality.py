@@ -2,6 +2,7 @@
 Page 2: India-Wide Air Quality Intelligence & State Benchmarking.
 """
 import streamlit as st
+from components.page_theme import prepare_page
 import pandas as pd
 import plotly.express as px
 from services.air_quality_service import get_india_wide_monitoring_status
@@ -10,8 +11,8 @@ from components.cards import render_metric_card
 
 st.set_page_config(page_title="India Air Quality | Air Quality Predictor", page_icon="🇮🇳", layout="wide")
 
-with open("assets/styles.css") as f:
-    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+prepare_page()
+
 
 # Fetch Dynamic India Monitoring Status
 status_summary = get_india_wide_monitoring_status()

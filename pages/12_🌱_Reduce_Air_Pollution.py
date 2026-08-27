@@ -2,14 +2,15 @@
 Page 12: Targeted Air Pollution Reduction & Action Frameworks.
 """
 import streamlit as st
+from components.page_theme import prepare_page
 from services.air_quality_service import fetch_live_city_air_quality
 from services.location_service import load_indian_cities
 from components.navbar import render_command_header
 
 st.set_page_config(page_title="Reduce Air Pollution | Air Quality Predictor", page_icon="🌱", layout="wide")
 
-with open("assets/styles.css") as f:
-    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+prepare_page()
+
 
 cities = load_indian_cities()
 city_names = [c["city"] for c in cities]

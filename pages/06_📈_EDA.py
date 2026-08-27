@@ -2,6 +2,7 @@
 Page 6: Exploratory Data Analysis & Statistical Environmental Patterns.
 """
 import streamlit as st
+from components.page_theme import prepare_page
 import pandas as pd
 import plotly.express as px
 
@@ -15,8 +16,8 @@ st.set_page_config(
     layout="wide",
 )
 
-with open("assets/styles.css", encoding="utf-8") as f:
-    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+prepare_page()
+
 
 render_command_header(
     city="Statistical Analytics",

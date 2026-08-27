@@ -2,6 +2,7 @@
 Page 3: Alert Cities & Critical Hotspot Diagnostics.
 """
 import streamlit as st
+from components.page_theme import prepare_page
 import pandas as pd
 from services.air_quality_service import get_india_wide_monitoring_status
 from ml.driver_analysis import analyze_pollutant_drivers
@@ -12,8 +13,8 @@ from components.charts import render_driver_breakdown_chart
 
 st.set_page_config(page_title="Alert Cities | Air Quality Predictor", page_icon="🚨", layout="wide")
 
-with open("assets/styles.css") as f:
-    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+prepare_page()
+
 
 status_summary = get_india_wide_monitoring_status()
 df_india = status_summary["dataset_df"]

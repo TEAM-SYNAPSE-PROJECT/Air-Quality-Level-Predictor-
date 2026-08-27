@@ -2,16 +2,17 @@
 Page 10: Isolation Forest Atmospheric Anomaly & Spike Detection.
 """
 import streamlit as st
+from components.page_theme import prepare_page
 import pandas as pd
-import plotly.express as px
+import plotly.graph_objects as go
 from ml.anomaly_detector import AirQualityAnomalyDetector
 from components.navbar import render_command_header
 from components.cards import render_metric_card
 
 st.set_page_config(page_title="Anomaly Detection | Air Quality Predictor", page_icon="🔍", layout="wide")
 
-with open("assets/styles.css") as f:
-    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+prepare_page()
+
 
 render_command_header(city="Anomaly Diagnostics", state="Machine Learning Pipeline", status="ANOMALY ENGINE")
 
@@ -47,27 +48,15 @@ with m3:
 st.markdown("---")
 
 # Visualizer
-st.markdown("#### 📉 Multivariate Anomaly Distribution Scatter")
-fig_anom = px.scatter(
-    df_anomaly,
-    x="timestamp" if "timestamp" in df_anomaly.columns else df_anomaly.index,
-    y="pm25",
-    color="is_anomaly",
-    color_discrete_map={True: "#EF4444", False: "#C5A368"},
-    size="anomaly_size",
-    size_max=10,
-    title="PM2.5 Concentrations with Isolation Forest Anomalies (Red Points)",
-    labels={"is_anomaly": "Anomaly Detected", "pm25": "PM2.5 (µg/m³)"}
-)
-fig_anom.update_layout(
-    paper_bgcolor="#0A0A0A",
-    plot_bgcolor="#111111",
-    font={"color": "#888888", "family": "Plus Jakarta Sans"},
-    xaxis=dict(gridcolor="#1A1A1A", zerolinecolor="#2A2A2A"),
-    yaxis=dict(gridcolor="#1A1A1A", zerolinecolor="#2A2A2A"),
-    height=400
-)
-st.plotly_chart(fig_anom, use_container_width=True)
+st.markdown("#### 📈 Atmospheric Anomaly Timeline")
+fig_anom=go.Figure()
+normal=df_anomaly[~df_anomaly["is_anomaly"]]
+outliers=df_anomaly[df_anomaly["is_anomaly"]]
+xcol="timestamp" if "timestamp" in df_anomaly.columns else df_anomaly.index
+fig_anom.add_trace(go.Scatter(x=normal[xcol],y=normal["pm25"],mode="lines",name="Normal telemetry",line=dict(color="#38bdf8",width=2)))
+fig_anom.add_trace(go.Scatter(x=outliers[xcol],y=outliers["pm25"],mode="markers",name="Detected anomaly",marker=dict(color="#f43f5e",size=11,line=dict(color="#fff",width=1))))
+fig_anom.update_layout(paper_bgcolor="rgba(0,0,0,0)",plot_bgcolor="rgba(7,12,24,.55)",font={"color":"#cbd5e1","family":"Plus Jakarta Sans"},xaxis=dict(gridcolor="rgba(148,163,184,.12)"),yaxis=dict(gridcolor="rgba(148,163,184,.12)"),height=420,hoverlabel=dict(bgcolor="#0b1220"),legend=dict(orientation="h",y=1.02,yanchor="bottom"),title="PM2.5 telemetry with Isolation Forest outliers")
+st.plotly_chart(fig_anom,use_container_width=True)
 
 # Outlier Log Table
 st.markdown("#### 📋 Top Identified Atmospheric Outlier Events")

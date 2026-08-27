@@ -1,0 +1,24 @@
+DEEP LEARNING ADDITION
+
+1. Copy the `dl` folder into your project root.
+2. Copy `17_🧠_Deep_Learning_Forecast.py` into your `pages` folder.
+3. Add this line to requirements.txt:
+   tensorflow>=2.20.0
+
+4. Install:
+   pip install -r requirements.txt
+
+5. Train from the project root:
+   python -m dl.train_lstm
+
+6. Start Streamlit:
+   streamlit run app.py
+
+The training command creates:
+models/deep_learning/aqi_lstm.keras
+models/deep_learning/feature_scaler.pkl
+models/deep_learning/target_scaler.pkl
+models/deep_learning/metadata.json
+
+The existing Random Forest/XGBoost models are not replaced.
+The LSTM is an additional Deep Learning forecasting model.

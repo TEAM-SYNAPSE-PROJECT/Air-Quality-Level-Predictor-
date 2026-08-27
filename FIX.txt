@@ -1,0 +1,15 @@
+FIX FOR STREAMLIT DUPLICATE BUTTON ERROR
+
+Replace:
+services/auth_service.py
+
+This version gives each login/logout button a unique Streamlit key and updates
+use_container_width=True to the current width="stretch" API.
+
+The error shown in the screenshot was:
+StreamlitDuplicateElementId: There are multiple `button` elements with the same auto-generated ID.
+
+After replacing the file, restart Streamlit with:
+streamlit run app.py
+
+If Streamlit is already running, press Ctrl+C first, then run it again.

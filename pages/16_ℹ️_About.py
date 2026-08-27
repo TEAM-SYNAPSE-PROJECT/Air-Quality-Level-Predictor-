@@ -2,12 +2,13 @@
 Page 16: About the Platform, Scientific Methodology & Architecture.
 """
 import streamlit as st
+from components.page_theme import prepare_page
 from components.navbar import render_command_header
 
 st.set_page_config(page_title="About | Air Quality Predictor", page_icon="ℹ️", layout="wide")
 
-with open("assets/styles.css") as f:
-    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+prepare_page()
+
 
 render_command_header(city="Documentation", state="Architecture & Standards", status="SYSTEM SPECS")
 

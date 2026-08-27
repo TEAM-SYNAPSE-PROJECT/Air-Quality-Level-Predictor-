@@ -1,0 +1,28 @@
+{
+  "model": "LSTM",
+  "target": "PM2.5",
+  "lookback_hours": 24,
+  "features": [
+    "pm25",
+    "pm10",
+    "no2",
+    "so2",
+    "co",
+    "o3",
+    "temperature",
+    "humidity",
+    "wind_speed",
+    "pressure",
+    "hour_sin",
+    "hour_cos"
+  ],
+  "train_samples": 1200,
+  "test_samples": 216,
+  "epochs_requested": 35,
+  "epochs_completed": 10,
+  "metrics": {
+    "rmse": 1.6645648180234645,
+    "mae": 1.3569620847702026,
+    "r2": 0.8630776405334473
+  }
+}

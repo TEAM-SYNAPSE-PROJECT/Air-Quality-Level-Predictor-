@@ -2,6 +2,7 @@
 Page 1: Comprehensive AQI Dashboard & Sub-Index Analytics.
 """
 import streamlit as st
+from components.page_theme import prepare_page
 import pandas as pd
 from utils.time_utils import get_live_time_metrics
 from utils.season_utils import get_current_season
@@ -16,9 +17,9 @@ from components.location_card import render_location_action_bar, render_location
 
 st.set_page_config(page_title="AQI Dashboard | Air Quality Predictor", page_icon="📊", layout="wide")
 
+prepare_page()
+
 # Apply custom CSS
-with open("assets/styles.css") as f:
-    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 # State initialization
 if "selected_city" not in st.session_state:

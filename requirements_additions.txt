@@ -1,0 +1,2 @@
+# Add this line to your existing requirements.txt for Deep Learning
+tensorflow>=2.20.0

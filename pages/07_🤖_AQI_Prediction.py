@@ -2,6 +2,7 @@
 Page 7: Machine Learning Multi-Horizon AQI Forecasting & Model Benchmarks.
 """
 import streamlit as st
+from components.page_theme import prepare_page
 import pandas as pd
 import json
 import os
@@ -15,10 +16,10 @@ from components.navbar import render_command_header
 from components.charts import render_forecast_horizon_chart, render_model_comparison_chart
 from components.cards import render_metric_card
 
-st.set_page_config(page_title="AQI Prediction | Air Quality Predictor", page_icon="🤖", layout="wide")
+st.set_page_config(page_title="Future AQI Prediction | Air Quality Predictor", page_icon="🤖", layout="wide")
 
-with open("assets/styles.css") as f:
-    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+prepare_page()
+
 
 cities = load_indian_cities()
 city_names = [c["city"] for c in cities]
@@ -32,7 +33,7 @@ aq_data = fetch_live_city_air_quality(city_obj["lat"], city_obj["lon"], city_obj
 
 render_command_header(city=city_obj["city"], state=city_obj["state"], lat=city_obj["lat"], lon=city_obj["lon"], status=aq_data["status"])
 
-st.markdown("### 🤖 MACHINE LEARNING AQI FORECASTING & BENCHMARK SUITE")
+st.markdown("### 🔮 FUTURE AQI PREDICTION & BENCHMARK SUITE")
 st.caption("Auto-regressive multi-step ahead projections trained on chronological splits using Ridge Regression, Random Forest, and Gradient Boosted Trees.")
 
 # Load Model Metadata
@@ -43,7 +44,7 @@ if os.path.exists(meta_path):
         model_meta = json.load(f)
 
 # Forecast Horizons
-st.markdown("#### 🔮 Multi-Horizon Projections (Predicted Ahead)")
+st.markdown("#### 🔮 Future AQI Prediction Timeline")
 forecast_results = generate_multi_horizon_forecast(aq_data["pollutants"], weather_context={
     "temperature": 29.0,
     "humidity": 68.0,

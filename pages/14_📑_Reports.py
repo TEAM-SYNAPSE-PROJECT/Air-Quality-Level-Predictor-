@@ -2,6 +2,7 @@
 Page 14: Comprehensive Environmental Audit Reports (PDF / CSV Exports).
 """
 import streamlit as st
+from components.page_theme import prepare_page
 from datetime import datetime
 from services.air_quality_service import fetch_live_city_air_quality
 from services.weather_service import get_live_weather
@@ -12,11 +13,11 @@ from ml.early_warning import evaluate_early_warnings
 from utils.time_utils import get_live_time_metrics
 from utils.season_utils import get_current_season
 from components.navbar import render_command_header
+from services.auth_service import require_login_for_download
 
 st.set_page_config(page_title="Audit Reports | Air Quality Predictor", page_icon="📑", layout="wide")
 
-with open("assets/styles.css") as f:
-    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+prepare_page()
 
 cities = load_indian_cities()
 city_names = [c["city"] for c in cities]
@@ -60,7 +61,13 @@ report_payload = {
     "warnings": warnings
 }
 
-render_command_header(city=city_obj["city"], state=city_obj["state"], lat=city_obj["lat"], lon=city_obj["lon"], status=aq_data["status"])
+render_command_header(
+    city=city_obj["city"],
+    state=city_obj["state"],
+    lat=city_obj["lat"],
+    lon=city_obj["lon"],
+    status=aq_data["status"]
+)
 
 st.markdown("### 📑 ENVIRONMENTAL INTELLIGENCE AUDIT REPORT GENERATOR")
 st.caption("Generate official audit dossiers with strict structural demarcation between Observed Real-Time Telemetry and Machine Learning Projections.")
@@ -68,25 +75,36 @@ st.caption("Generate official audit dossiers with strict structural demarcation 
 # Export Buttons
 btn_c1, btn_c2, btn_c3 = st.columns([1, 1, 2])
 
-with btn_c1:
-    pdf_bytes = generate_pdf_report(report_payload)
-    st.download_button(
-        label="📄 Download Official PDF Report",
-        data=pdf_bytes,
-        file_name=f"AQI_Audit_Report_{city_obj['city']}_{datetime.now().strftime('%Y%m%d_%H%M')}.pdf",
-        mime="application/pdf",
-        use_container_width=True
-    )
+# IMPORTANT: Check login only ONCE.
+# The original code called require_login_for_download() twice,
+# which created two identical Google login buttons.
+download_unlocked = require_login_for_download()
 
-with btn_c2:
-    csv_text = generate_csv_report(report_payload)
-    st.download_button(
-        label="📊 Download CSV Telemetry Dataset",
-        data=csv_text,
-        file_name=f"AQI_Telemetry_{city_obj['city']}_{datetime.now().strftime('%Y%m%d')}.csv",
-        mime="text/csv",
-        use_container_width=True
-    )
+if download_unlocked:
+
+    with btn_c1:
+        pdf_bytes = generate_pdf_report(report_payload)
+
+        st.download_button(
+            label="📄 Download Official PDF Report",
+            data=pdf_bytes,
+            file_name=f"AQI_Audit_Report_{city_obj['city']}_{datetime.now().strftime('%Y%m%d_%H%M')}.pdf",
+            mime="application/pdf",
+            use_container_width=True,
+            key="reports_pdf_download"
+        )
+
+    with btn_c2:
+        csv_text = generate_csv_report(report_payload)
+
+        st.download_button(
+            label="📊 Download CSV Telemetry Dataset",
+            data=csv_text,
+            file_name=f"AQI_Telemetry_{city_obj['city']}_{datetime.now().strftime('%Y%m%d')}.csv",
+            mime="text/csv",
+            use_container_width=True,
+            key="reports_csv_download"
+        )
 
 st.markdown("---")
 
@@ -101,7 +119,7 @@ with st.expander("📄 View Formatted Document Hierarchy (Observed vs Predicted 
     - **Audit Generation Timestamp:** `{t_metrics['date_str']} {t_metrics['time_str']} IST`
     - **Current Indian Season:** `{season['name'].upper()}`
     - **Data Pipeline Provenance:** `{aq_data['status']}`
-    
+
     ---
     ### 2. Observed Air Quality Metrics (ACTUAL MEASUREMENTS)
     - **Indian CPCB NAQI:** **{aq_data['aqi']}** ({aq_data['aqi_category'].upper()})
@@ -112,14 +130,14 @@ with st.expander("📄 View Formatted Document Hierarchy (Observed vs Predicted 
     - **Sulfur Dioxide (SO2):** `{aq_data['pollutants']['so2']} µg/m³` (Sub-Index: {aq_data.get('sub_indices', {}).get('so2', 'N/A')})
     - **Carbon Monoxide (CO):** `{aq_data['pollutants']['co']} mg/m³` (Sub-Index: {aq_data.get('sub_indices', {}).get('co', 'N/A')})
     - **Ground-Level Ozone (O3):** `{aq_data['pollutants']['o3']} µg/m³` (Sub-Index: {aq_data.get('sub_indices', {}).get('o3', 'N/A')})
-    
+
     ---
     ### 3. Meteorological Dispersion Conditions
     - **Surface Ambient Temperature:** `{weather['temperature']} °C` (Feels: `{weather['feels_like']} °C`)
     - **Relative Humidity:** `{weather['humidity']} %`
     - **Surface Wind Speed:** `{weather['wind_speed']} km/h` (Direction: `{weather['wind_direction']}°`)
     - **Atmospheric Pressure:** `{weather['pressure']} hPa`
-    
+
     ---
     ### 4. Machine Learning AQI Forecast (PREDICTED - NOT OBSERVED)
     - **+1 Hour Ahead:** Predicted AQI `{forecasts[0]['predicted_aqi']}` ({forecasts[0]['aqi_category']}) | Risk: {forecasts[0]['risk_level']}

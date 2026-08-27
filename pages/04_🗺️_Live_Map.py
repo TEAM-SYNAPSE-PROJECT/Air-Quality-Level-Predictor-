@@ -2,6 +2,7 @@
 Page 4: Interactive Geospatial Air Quality Map of India.
 """
 import streamlit as st
+from components.page_theme import prepare_page
 import pandas as pd
 from streamlit_folium import st_folium
 from services.air_quality_service import get_india_wide_monitoring_status
@@ -11,8 +12,8 @@ from components.maps import create_folium_air_quality_map, create_plotly_india_r
 
 st.set_page_config(page_title="Live Map | Air Quality Predictor", page_icon="🗺️", layout="wide")
 
-with open("assets/styles.css") as f:
-    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+prepare_page()
+
 
 if "selected_lat" not in st.session_state:
     st.session_state.selected_lat = 28.6139

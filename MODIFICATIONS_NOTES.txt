@@ -1,0 +1,13 @@
+AIR QUALITY LEVEL PREDICTOR - REQUESTED UI CHANGES
+
+1. The Home/App page no longer renders the Live Map section.
+2. The Home/App page no longer renders the embedded AI Assistant section.
+3. The existing AI Assistant remains a separate Streamlit page:
+   pages/13_#L01f4ac_AI_Assistant.py
+4. The AI Assistant page uses its own distinct color-only background theme (no background images).
+5. The Profile page filename was cleaned to:
+   pages/18_👤_Profile.py
+6. Profile navigation links were updated to use the new exact filename.
+7. No other project files or folders were intentionally changed.
+
+The original project structure and existing functionality were preserved as much as possible.

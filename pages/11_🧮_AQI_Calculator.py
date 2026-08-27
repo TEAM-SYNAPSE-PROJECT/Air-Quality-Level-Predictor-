@@ -2,6 +2,7 @@
 Page 11: Interactive CPCB NAQI Manual Calculator & Sub-Index Simulator.
 """
 import streamlit as st
+from components.page_theme import prepare_page
 from ml.aqi_calculator import calculate_indian_aqi, calculate_sub_index
 from components.navbar import render_command_header
 from components.gauges import render_aqi_gauge
@@ -9,8 +10,8 @@ from components.cards import render_metric_card
 
 st.set_page_config(page_title="AQI Calculator | Air Quality Predictor", page_icon="🧮", layout="wide")
 
-with open("assets/styles.css") as f:
-    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+prepare_page()
+
 
 render_command_header(city="NAQI Calculator", state="CPCB Standard Formula", status="INTERACTIVE")
 
