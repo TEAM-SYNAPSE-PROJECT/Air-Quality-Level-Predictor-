@@ -4,7 +4,6 @@ Provides browser HTML5 Geolocation triggering, manual location selector,
 detected location banner, nearest station analysis, and comprehensive parameter tables.
 """
 import streamlit as st
-import streamlit.components.v1 as components
 import pandas as pd
 from typing import Dict, Any, Optional
 from services.location_service import reverse_geocode_coordinates, find_nearest_monitoring_station
@@ -24,110 +23,195 @@ def render_location_action_bar(
     and manual switch controls as specified in Requirements 30-34 & 52.
     """
     # 1. HTML5 Geolocation Trigger Component
-    # When user clicks the primary HTML button or standard button, browser prompts for GPS permission.
-    gps_trigger_html = """
-    <div style="margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif;">
-        <script>
-        function requestBrowserGPS() {
-            const btn = document.getElementById('gps-btn');
-            const statusText = document.getElementById('gps-status');
-            if (btn) btn.innerHTML = "⏳ Detecting Satellite Location...";
-            if (statusText) statusText.innerHTML = "Requesting device GPS coordinates...";
-            
-            if (!navigator.geolocation) {
-                if (statusText) statusText.innerHTML = "❌ Geolocation is not supported by your browser.";
-                if (btn) btn.innerHTML = "📍 MY LOCATION";
-                return;
-            }
-            
-            navigator.geolocation.getCurrentPosition(
-                function(position) {
-                    const lat = position.coords.latitude;
-                    const lon = position.coords.longitude;
-                    const acc = position.coords.accuracy;
-                    if (btn) btn.innerHTML = "✅ Location Acquired!";
-                    if (statusText) statusText.innerHTML = "Coordinates: " + lat.toFixed(4) + "°N, " + lon.toFixed(4) + "°E (Accuracy: " + Math.round(acc) + "m)";
-                    
-                    try {
-                        const targetUrl = new URL(window.parent.location.href);
-                        targetUrl.searchParams.set('user_lat', lat.toFixed(6));
-                        targetUrl.searchParams.set('user_lon', lon.toFixed(6));
-                        targetUrl.searchParams.set('loc_source', 'gps');
-                        targetUrl.searchParams.set('acc', acc.toFixed(0));
-                        targetUrl.searchParams.set('t', Date.now().toString());
-                        window.parent.location.href = targetUrl.toString();
-                    } catch (e) {
-                        window.location.search = "?user_lat=" + lat.toFixed(6) + "&user_lon=" + lon.toFixed(6) + "&loc_source=gps&t=" + Date.now();
-                    }
-                },
-                function(error) {
-                    let errMsg = "Location permission was not granted.";
-                    if (error.code === 1) {
-                        errMsg = "Permission Denied. Please allow location access in your browser or select a city manually.";
-                    } else if (error.code === 2) {
-                        errMsg = "Position Unavailable. Please check your network or GPS signal.";
-                    } else if (error.code === 3) {
-                        errMsg = "Location request timed out. Please try again.";
-                    }
-                    if (btn) btn.innerHTML = "📍 MY LOCATION";
-                    if (statusText) statusText.innerHTML = "⚠️ " + errMsg;
-                    
-                    try {
-                        const targetUrl = new URL(window.parent.location.href);
-                        targetUrl.searchParams.set('loc_error', 'denied');
-                        targetUrl.searchParams.set('t', Date.now().toString());
-                        window.parent.location.href = targetUrl.toString();
-                    } catch (e) {}
-                },
-                {
-                    enableHighAccuracy: true,
-                    timeout: 12000,
-                    maximumAge: 0
-                }
-            );
-        }
-        </script>
-        
-        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-            <button id="gps-btn" onclick="requestBrowserGPS()" style="
-                background-color: #C5A368;
-                color: #0A0A0A;
-                border: none;
-                border-radius: 6px;
-                padding: 10px 18px;
-                font-size: 11px;
-                font-weight: 700;
-                text-transform: uppercase;
-                letter-spacing: 0.12em;
-                cursor: pointer;
-                display: inline-flex;
-                align-items: center;
-                gap: 6px;
-                transition: background 0.2s ease;
-            " onmouseover="this.style.backgroundColor='#D4B87C'" onmouseout="this.style.backgroundColor='#C5A368'">
-                📍 MY LOCATION
-            </button>
-            <button onclick="requestBrowserGPS()" style="
-                background-color: #151515;
-                color: #F5F5F5;
-                border: 1px solid #2A2A2A;
-                border-radius: 6px;
-                padding: 10px 16px;
-                font-size: 11px;
-                font-weight: 600;
-                text-transform: uppercase;
-                letter-spacing: 0.1em;
-                cursor: pointer;
-            " onmouseover="this.style.borderColor='#C5A368'; this.style.color='#C5A368'" onmouseout="this.style.borderColor='#2A2A2A'; this.style.color='#F5F5F5'">
-                🔄 REFRESH LOCATION
-            </button>
-            <span id="gps-status" style="font-size: 11px; color: #888888; margin-left: 8px;"></span>
+    # Streamlit 1.51+ Components v2 runs JavaScript in the app page (not an
+    # isolated v1 iframe), which allows browser geolocation to work reliably.
+    gps_component = st.components.v2.component(
+        name="live_browser_gps",
+        html="""
+        <div class="gps-wrap">
+            <button id="gps-btn" type="button">📍 MY LOCATION</button>
+            <button id="refresh-gps-btn" type="button">🔄 REFRESH LOCATION</button>
+            <span id="gps-status"></span>
         </div>
-    </div>
-    """
-    
-    st.components.v1.html(gps_trigger_html, height=48)
-    
+        """,
+        css="""
+        .gps-wrap {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        button {
+            border-radius: 6px;
+            padding: 10px 16px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.10em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        #gps-btn {
+            background: #C5A368;
+            color: #0A0A0A;
+            border: none;
+        }
+        #gps-btn:hover { background: #D4B87C; }
+        #refresh-gps-btn {
+            background: #151515;
+            color: #F5F5F5;
+            border: 1px solid #2A2A2A;
+        }
+        #refresh-gps-btn:hover {
+            border-color: #C5A368;
+            color: #C5A368;
+        }
+        #gps-status {
+            font-size: 11px;
+            color: #888888;
+            margin-left: 8px;
+        }
+        """,
+        js="""
+        export default function({ parentElement, setStateValue }) {
+            const btn = parentElement.querySelector('#gps-btn');
+            const refreshBtn = parentElement.querySelector('#refresh-gps-btn');
+            const status = parentElement.querySelector('#gps-status');
+
+            // Keep the browser watch outside the component function so a
+            // Streamlit rerun does not accidentally create multiple watches.
+            if (!window.__airQualityGPS) {
+                window.__airQualityGPS = {
+                    watchId: null,
+                    lastSent: null
+                };
+            }
+            const gps = window.__airQualityGPS;
+
+            function setStatus(text) {
+                if (status) status.textContent = text;
+            }
+
+            function locationSuccess(position) {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+                const accuracy = position.coords.accuracy || 0;
+                const now = Date.now();
+
+                // Avoid excessive Streamlit reruns while still tracking live.
+                // Send immediately on the first fix, then only after 15 seconds
+                // or when the device has moved roughly 25 metres or more.
+                let shouldSend = !gps.lastSent;
+                if (gps.lastSent) {
+                    const dLat = (lat - gps.lastSent.lat) * 111320;
+                    const dLon = (lon - gps.lastSent.lon) * 111320 * Math.cos(lat * Math.PI / 180);
+                    const movedMeters = Math.sqrt(dLat * dLat + dLon * dLon);
+                    shouldSend = movedMeters >= 25 || (now - gps.lastSent.time) >= 15000;
+                }
+
+                setStatus('📡 Live GPS active • ' + lat.toFixed(5) + '°, ' + lon.toFixed(5) + '° • ±' + Math.round(accuracy) + 'm');
+                if (btn) btn.innerHTML = '🟢 LIVE LOCATION';
+
+                if (shouldSend) {
+                    gps.lastSent = { lat: lat, lon: lon, time: now };
+                    setStateValue('location', {
+                        latitude: lat,
+                        longitude: lon,
+                        accuracy: accuracy,
+                        timestamp: now
+                    });
+                    setStateValue('error', null);
+                }
+            }
+
+            function locationError(error) {
+                let message = 'Location request failed.';
+                if (error.code === 1) {
+                    message = 'Permission denied. Allow Location for this site, then click MY LOCATION again.';
+                } else if (error.code === 2) {
+                    message = 'Position unavailable. Check GPS/Wi-Fi/network signal.';
+                } else if (error.code === 3) {
+                    message = 'Location request timed out. Please try again.';
+                }
+                setStatus('⚠️ ' + message);
+                if (btn) btn.innerHTML = '📍 MY LOCATION';
+                setStateValue('error', { code: error.code, message: message });
+            }
+
+            function startGPS() {
+                if (!navigator.geolocation) {
+                    locationError({ code: 2 });
+                    return;
+                }
+
+                setStatus('⏳ Requesting device GPS permission...');
+                if (btn) btn.innerHTML = '⏳ DETECTING LOCATION...';
+
+                if (gps.watchId !== null) {
+                    navigator.geolocation.clearWatch(gps.watchId);
+                    gps.watchId = null;
+                }
+
+                gps.watchId = navigator.geolocation.watchPosition(
+                    locationSuccess,
+                    locationError,
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 15000,
+                        maximumAge: 5000
+                    }
+                );
+            }
+
+            if (btn) btn.onclick = startGPS;
+            if (refreshBtn) refreshBtn.onclick = startGPS;
+
+            if (gps.watchId !== null) {
+                setStatus('📡 Live GPS active');
+                if (btn) btn.innerHTML = '🟢 LIVE LOCATION';
+            }
+        }
+        """
+    )
+
+    gps_result = gps_component(
+        default={"location": None, "error": None},
+        on_location_change=lambda: None,
+        on_error_change=lambda: None,
+        key="air_quality_live_gps"
+    )
+
+    # Pass the browser GPS result back through the same query-parameter path
+    # already used by app.py. No other project file needs to change.
+    gps_location = getattr(gps_result, "location", None)
+    gps_error = getattr(gps_result, "error", None)
+
+    if isinstance(gps_location, dict):
+        try:
+            lat = float(gps_location.get("latitude"))
+            lon = float(gps_location.get("longitude"))
+            if -90 <= lat <= 90 and -180 <= lon <= 180:
+                current_lat = str(st.query_params.get("user_lat", ""))
+                current_lon = str(st.query_params.get("user_lon", ""))
+                new_lat = f"{lat:.6f}"
+                new_lon = f"{lon:.6f}"
+                if current_lat != new_lat or current_lon != new_lon or st.query_params.get("loc_source") != "gps":
+                    st.query_params["user_lat"] = new_lat
+                    st.query_params["user_lon"] = new_lon
+                    st.query_params["loc_source"] = "gps"
+                    st.query_params["acc"] = str(round(float(gps_location.get("accuracy", 0))))
+                    st.query_params["t"] = str(int(float(gps_location.get("timestamp", 0))))
+                    st.query_params.pop("loc_error", None)
+                    st.rerun()
+        except (TypeError, ValueError):
+            pass
+
+    if isinstance(gps_error, dict) and gps_error.get("code"):
+        st.query_params["loc_error"] = "denied"
+
     # 2. Render Location Status Cards
     status_badge = '<span class="status-pill status-live">🟢 LOCATION DETECTED</span>' if is_live_gps else '<span class="status-pill status-local">📍 MANUAL LOCATION</span>'
     
